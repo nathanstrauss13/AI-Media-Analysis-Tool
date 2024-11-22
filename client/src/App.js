@@ -27,7 +27,7 @@ function App() {
       }).toString();
 
       const response = await fetch(
-        `http://localhost:5001/news?${queryParams}`,
+        `/api/news?${queryParams}`,
         {
           headers: {
             'Accept': 'application/json',
@@ -58,7 +58,7 @@ function App() {
       .join("\n");
 
     try {
-      const response = await fetch("http://localhost:5001/analyze", {
+      const response = await fetch("/api/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
