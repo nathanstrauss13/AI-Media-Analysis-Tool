@@ -16,7 +16,7 @@ Before you begin, ensure you have:
 
    ```bash
    git clone <repository-url>
-   cd media-ai-analysis-tool
+   cd AI-Media-Analysis-Tool
    ```
 
 2. **Environment Setup**
