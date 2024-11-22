@@ -9,42 +9,79 @@ function App() {
   const [articles, setArticles] = useState([]);
   const [selectedArticles, setSelectedArticles] = useState([]);
   const [analysis, setAnalysis] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     try {
+      const queryParams = new URLSearchParams({
+        query,
+        from,
+        to,
+        sources,
+        exclude,
+      }).toString();
+
       const response = await fetch(
-        `http://localhost:5001/news?query=${query}&from=${from}&to=${to}&sources=${sources}&exclude=${exclude}`
+        `http://localhost:5001/news?${queryParams}`,
+        {
+          headers: {
+            'Accept': 'application/json',
+          },
+        }
       );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
       setArticles(data.articles || []);
     } catch (error) {
       console.error("Error fetching news:", error);
+      setError("Failed to fetch news articles. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleAnalyze = async () => {
+    setIsLoading(true);
+    setError(null);
+
     const selectedText = selectedArticles
       .map((index) => articles[index].title)
       .join("\n");
 
     try {
-        const response = await fetch("http://localhost:5001/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                prompt: `Summarize and analyze these articles:\n${selectedText}`,
-            }),
-        });
+      const response = await fetch("http://localhost:5001/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: `Summarize and analyze these articles:\n${selectedText}`,
+        }),
+      });
 
-        const data = await response.json();
-        setAnalysis(data.analysis);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setAnalysis(data.analysis);
     } catch (error) {
-        console.error("Error with analysis:", error);
+      console.error("Error with analysis:", error);
+      setError("Failed to analyze articles. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-};
-
+  };
 
   const handleArticleSelection = (index) => {
     setSelectedArticles((prevSelected) =>
@@ -57,6 +94,13 @@ function App() {
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <h1>Media AI Analysis Tool</h1>
+
+      {error && (
+        <div style={{ color: 'red', marginBottom: '20px' }}>
+          {error}
+        </div>
+      )}
+
       <form onSubmit={handleSearch} style={{ marginBottom: "20px" }}>
         <div>
           <label>Search Query: </label>
@@ -102,36 +146,48 @@ function App() {
             placeholder="e.g., politics"
           />
         </div>
-        <button type="submit">Search</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Searching..." : "Search"}
+        </button>
       </form>
 
       <h2>Results:</h2>
-      <ul>
-        {articles.map((article, index) => (
-          <li key={index}>
-            <input
-              type="checkbox"
-              checked={selectedArticles.includes(index)}
-              onChange={() => handleArticleSelection(index)}
-            />
-            <a href={article.url} target="_blank" rel="noopener noreferrer">
-              {article.title}
-            </a>
-          </li>
-        ))}
-      </ul>
+      {isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <ul>
+            {articles.map((article, index) => (
+              <li key={index}>
+                <input
+                  type="checkbox"
+                  checked={selectedArticles.includes(index)}
+                  onChange={() => handleArticleSelection(index)}
+                />
+                <a href={article.url} target="_blank" rel="noopener noreferrer">
+                  {article.title}
+                </a>
+              </li>
+            ))}
+          </ul>
 
-      {selectedArticles.length > 0 && (
-        <button onClick={handleAnalyze} style={{ marginTop: "20px" }}>
-          Analyze Selected Articles
-        </button>
-      )}
+          {selectedArticles.length > 0 && (
+            <button
+              onClick={handleAnalyze}
+              style={{ marginTop: "20px" }}
+              disabled={isLoading}
+            >
+              {isLoading ? "Analyzing..." : "Analyze Selected Articles"}
+            </button>
+          )}
 
-      {analysis && (
-        <div>
-          <h3>AI Analysis:</h3>
-          <p>{analysis}</p>
-        </div>
+          {analysis && (
+            <div>
+              <h3>AI Analysis:</h3>
+              <p>{analysis}</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
