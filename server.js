@@ -1,66 +1,58 @@
 const express = require('express');
-const axios = require('axios');
 const cors = require('cors');
-require('dotenv').config();  // Load environment variables from .env file
-const { OpenAI } = require("openai");
+const axios = require('axios');
+require('dotenv').config();
 
-// Initialize Express app
 const app = express();
+const PORT = 5001;
+
+// Middleware
 app.use(cors());
-app.use(express.json());  // Middleware to parse JSON bodies
+app.use(express.json());
 
-const PORT = process.env.PORT || 5002;  // Change port to 5002
-
-// Initialize OpenAI client
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,  // Your OpenAI API key from the .env file
-});
-
-// Route for /news (News API integration)
+// News API endpoint
 app.get('/news', async (req, res) => {
-    const { query, from, to, sources, exclude } = req.query;
-
-    // Build the URL to call the News API
-    const url = `https://newsapi.org/v2/everything`;
-
     try {
-        const response = await axios.get(url, {
-            params: {
-                q: query,               // Search query
-                from,                    // From date
-                to,                      // To date
-                sources,                 // Sources of news
-                exclude,                 // Words to exclude
-                apiKey: process.env.NEWS_API_KEY,  // News API key from .env
-            },
-        });
-        res.json(response.data);  // Return the fetched news articles
+        const { query, from, to, sources, exclude } = req.query;
+        const NEWS_API_KEY = process.env.NEWS_API_KEY;
+
+        let url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${NEWS_API_KEY}`;
+
+        if (from) url += `&from=${from}`;
+        if (to) url += `&to=${to}`;
+        if (sources) url += `&sources=${sources}`;
+
+        const response = await axios.get(url);
+        res.json(response.data);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('News API Error:', error.response?.data || error.message);
+        res.status(500).json({ error: 'Failed to fetch news' });
     }
 });
 
-// Route for /analyze (AI Analysis using OpenAI)
+// Analysis endpoint
 app.post('/analyze', async (req, res) => {
-    const { prompt } = req.body;  // Get the prompt from the request body
-    console.log('Received prompt:', prompt);  // Log the received prompt for debugging
-
     try {
-        // Send the prompt to OpenAI's GPT model for analysis
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4",  // Replace with the model you're using (e.g., GPT-3 or GPT-4)
-            messages: [{ role: "user", content: prompt }],
+        const { prompt } = req.body;
+        const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+        const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: prompt }]
+        }, {
+            headers: {
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
         });
 
-        // Send back the analysis as a response
-        res.json({ analysis: completion.choices[0].message.content });
+        res.json({ analysis: response.data.choices[0].message.content });
     } catch (error) {
-        console.error("Error with OpenAI:", error);
-        res.status(500).json({ error: error.message });
+        console.error('OpenAI API Error:', error.response?.data || error.message);
+        res.status(500).json({ error: 'Failed to analyze articles' });
     }
 });
 
-// Start the server and listen on the specified port
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
