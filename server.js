@@ -65,3 +65,28 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+// Analysis endpoint for ChatGPT interaction
+app.post('/api/analyze', async (req, res) => {
+  try {
+    const { prompt } = req.body; // Extract the prompt from the request body
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+    // Make the POST request to OpenAI's API
+    const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+      model: "gpt-3.5-turbo", // Or "gpt-4" if you prefer
+      messages: [{ role: "user", content: prompt }]
+    }, {
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // Return the analysis response back to the client
+    const analysis = response.data.choices[0].message.content;
+    res.json({ analysis });
+  } catch (error) {
+    console.error("Error with OpenAI:", error);
+    res.status(500).json({ error: "Failed to get analysis from OpenAI" });
+  }
+});
