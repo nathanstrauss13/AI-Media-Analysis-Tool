@@ -1,1 +1,44 @@
+.chat-box {
+  border: 1px solid #ccc;
+  padding: 20px;
+  width: 400px;
+  max-height: 500px;
+  overflow-y: auto;
+  margin: 0 auto;
+}
+
+.messages {
+  margin-bottom: 20px;
+}
+
+.messages .user {
+  text-align: left;
+}
+
+.messages .ai {
+  text-align: right;
+}
+
+.input-area {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-area input {
+  width: 80%;
+  padding: 8px;
+}
+
+.input-area button {
+  width: 15%;
+  padding: 8px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.input-area button:disabled {
+  background-color: #ccc;
+}
 
