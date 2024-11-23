@@ -76,3 +76,11 @@ Before you begin, ensure you have:
 - APIs: NewsAPI, OpenAI GPT-3.5
 
 The application will be available at `http://localhost:3000`
+
+## Wishlist 
+- Simple search interface w/ dropdown for advanced search (mirroring google news search UI) 
+- Defaults at recent news sorted by relevance no dates
+- Omit “removed” broken links
+- Automatically return results with all article radio buttons selected 
+- Add buttons to select all and deselect all
+- Change analyze button to a chat GPT dialog box that opens a conversation in a new tab once you submit a question
