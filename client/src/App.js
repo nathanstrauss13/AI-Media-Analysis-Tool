@@ -1,4 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
+import ChatBox from "./ChatBox";  // Import the ChatBox component
+
+function App() {
+  return (
+    <div className="App">
+      <h1>AI Media Analysis Tool</h1>
+      <ChatBox /> {/* Add the ChatBox here */}
+    </div>
+  );
+}
+
+export default App;
+
 
 function App() {
   const [query, setQuery] = useState("");
