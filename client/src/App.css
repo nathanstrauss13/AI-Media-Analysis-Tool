@@ -1,44 +1,132 @@
-.chat-box {
-  border: 1px solid #ccc;
-  padding: 20px;
-  width: 400px;
-  max-height: 500px;
-  overflow-y: auto;
-  margin: 0 auto;
+/* App.css */
+body {
+  background-color: #121212; /* Dark background */
+  color: #eaeaea; /* Light text color */
+  font-family: 'Montserrat', sans-serif; /* Modern sans-serif font */
+  margin: 0;
+  padding: 0;
 }
 
-.messages {
+.app-container {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.app-header {
+  color: #f5f5f5; /* Light text */
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.error-message {
+  color: #ff1744; /* Red error color */
   margin-bottom: 20px;
 }
 
-.messages .user {
-  text-align: left;
+.search-form {
+  margin-bottom: 20px;
 }
 
-.messages .ai {
-  text-align: right;
+.input-container {
+  margin-bottom: 10px;
 }
 
-.input-area {
+.input-field {
+  width: 100%;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #333;
+  background-color: #333;
+  color: #eaeaea;
+}
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #757575; /* Gray button */
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #616161; /* Darker gray on hover */
+}
+
+.toggle-button {
+  background-color: #444;
+  color: white;
+}
+
+.submit-button,
+.summarize-button {
+  background-color: #9e9e9e; /* Lighter gray for submit buttons */
+  margin-top: 20px;
+  width: 100%;
+}
+
+.submit-button:disabled,
+.summarize-button:disabled {
+  background-color: #888;
+}
+
+.articles-list {
+  margin-top: 20px;
+}
+
+.article-card {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background-color: #2b2b2b;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+.article-link {
+  color: #bdbdbd; /* Lighter gray for links */
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+.article-link:hover {
+  text-decoration: underline;
+}
+
+.checkbox {
+  margin-right: 10px;
+}
+
+.select-buttons {
   display: flex;
   justify-content: space-between;
 }
 
-.input-area input {
-  width: 80%;
-  padding: 8px;
+.select-all-button,
+.unselect-all-button {
+  background-color: #757575;
+  padding: 8px 16px;
 }
 
-.input-area button {
-  width: 15%;
-  padding: 8px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
+.select-all-button:hover,
+.unselect-all-button:hover {
+  background-color: #616161;
 }
 
-.input-area button:disabled {
-  background-color: #ccc;
+.summary-container {
+  margin-top: 20px;
+  background-color: #2b2b2b;
+  padding: 20px;
+  border-radius: 6px;
 }
 
+.summary-container h3 {
+  color: #eaeaea; /* Light color for the header */
+  font-weight: 600;
+}

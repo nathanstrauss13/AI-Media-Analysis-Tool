@@ -42,7 +42,7 @@ const ChatBox = () => {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type your message..."
+          placeholder="Ask AI..."
         />
         <button onClick={handleSend}>Send</button>
       </div>
