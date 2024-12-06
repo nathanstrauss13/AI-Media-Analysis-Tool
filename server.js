@@ -18,25 +18,61 @@ app.use(express.static(path.join(__dirname, 'client/build')))
 // News API endpoint
 app.get('/api/news', async (req, res) => {
   try {
-    const {query, from, to, sources, exclude} = req.query
-    const NEWS_API_KEY = process.env.NEWS_API_KEY
+    const { query, from, to, sources } = req.query;
+    const NEWS_API_KEY = process.env.NEWS_API_KEY;
 
-    let url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${NEWS_API_KEY}`
+    let url = `https://newsapi.org/v2/everything?q=${query}&apiKey=${NEWS_API_KEY}`;
+    if (from) url += `&from=${from}`;
+    if (to) url += `&to=${to}`;
+    if (sources) url += `&sources=${sources}`;
 
-    if (from) url += `&from=${from}`
-    if (to) url += `&to=${to}`
-    if (sources) url += `&sources=${sources}`
+    // Fetch News API articles
+    const newsResponse = await axios.get(url);
+    const articles = newsResponse.data.articles;
 
-    const response = await axios.get(url)
-    
-    console.log(response.data)
+    if (!articles || articles.length === 0) {
+      return res.status(404).json({ error: 'No articles found.' });
+    }
 
-    res.json(response.data)
+    // Parse the full content of each article
+    const parsedArticles = await Promise.all(
+      articles.map(async (article, index) => {
+         
+        try {
+          // Fetch the article HTML
+          const articleHtmlResponse = await axios.get(article.url);
+
+          // Parse the HTML using JSDOM and Readability
+          const dom = new JSDOM(articleHtmlResponse.data, {
+            url: article.url, // Required for Readability to resolve relative URLs
+          });
+          const parsedArticle = new Readability(dom.window.document).parse();
+
+          return {
+            title: parsedArticle?.title || article.title,
+            content: parsedArticle?.textContent || article.content,
+            description: parsedArticle?.description || article.description,
+            url: article.url,
+            source: article.source.name,
+          };
+        } catch (error) {
+          console.error(`Error parsing article at ${article.url}:`, error.message);
+          return {
+            title: article.title,
+            content: 'Content could not be fetched or parsed.',
+            url: article.url,
+            source: article.source.name,
+          };
+        }
+      })
+    );
+
+    res.json(parsedArticles);
   } catch (error) {
-    console.error('News API Error:', error.response?.data || error.message)
-    res.status(500).json({error: 'Failed to fetch news'})
+    console.error('News API Error:', error.response?.data || error.message);
+    res.status(500).json({ error: 'Failed to fetch news or parse articles.' });
   }
-})
+});
 
 // Analysis endpoint
 app.post('/api/analyze', async (req, res) => {
