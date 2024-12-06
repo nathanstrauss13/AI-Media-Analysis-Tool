@@ -2,6 +2,8 @@ const express = require('express')
 const cors = require('cors')
 const axios = require('axios')
 const path = require('path')
+const { JSDOM } = require('jsdom')
+const { Readability } = require('@mozilla/readability')
 require('dotenv').config()
 
 const app = express()
@@ -26,6 +28,9 @@ app.get('/api/news', async (req, res) => {
     if (sources) url += `&sources=${sources}`
 
     const response = await axios.get(url)
+    
+    console.log(response.data)
+
     res.json(response.data)
   } catch (error) {
     console.error('News API Error:', error.response?.data || error.message)
