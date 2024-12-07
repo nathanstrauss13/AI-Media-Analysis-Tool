@@ -48,6 +48,13 @@ app.get('/api/news', async (req, res) => {
           });
           const parsedArticle = new Readability(dom.window.document).parse();
 
+          console.log('REG length:', articles.length)
+          console.log('PARSED length:', parsedArticle.length)
+          console.log('REG TITLES:',  article.title)
+          console.log('PARSED TITLES:', parsedArticle?.title, article.title)
+          console.log('REG CONTENT:', article.content)
+          console.log('PARSED CONTENT:', parsedArticle?.textContent)                  
+
           return {
             title: parsedArticle?.title || article.title,
             content: parsedArticle?.textContent || article.content,
