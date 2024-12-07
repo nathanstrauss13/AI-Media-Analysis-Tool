@@ -40,7 +40,7 @@ function App() {
 
       const data = await response.json();
       // Filter out articles with a URL containing "https://removed.com/" or status "removed" or containing "[Removed]" in any of the article fields
-      const filteredArticles = data.articles.filter(
+      const filteredArticles = data.filter(
         (article) =>
           !article.url.includes("https://removed.com/") &&
           article.status !== "removed" &&
